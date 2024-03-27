@@ -1,0 +1,12 @@
+
+##Liste des commandes a faire 
+
+docker build -t react-app-image:1 -f Dockerfile.dev .
+
+
+docker run -d -p 3000:3000 -v /app/node_modules -v $(pwd):/app --name dockerized-react-app react-app-image:1
+
+
+
+
+
