@@ -1,6 +1,8 @@
 
 ##Liste des commandes a faire 
 
+Npm i
+
 docker build -t react-app-image:1 -f Dockerfile.dev .
 
 
