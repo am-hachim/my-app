@@ -15,7 +15,11 @@ jobs:
         username: root
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
-          mkdir -p ~/app
+            ls
+            cd ..
+            cd /t
+            ls
+            mkdir actiontest
 
 
 # name: Push Container to Server
