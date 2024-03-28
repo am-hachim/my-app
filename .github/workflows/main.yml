@@ -1,15 +1,35 @@
-name: Push Container to Server
 
-on:
-  push:
-    branches:
-      - location
+name: Deploy to Server
+
+on: [push]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Executing remote SSH commands to create app directory
+      uses: appleboy/ssh-action@master
+      with:
+        host: "62.72.36.174"
+        username: root
+        password: ${{ secrets.SERVER_PASSWORD }}
+        script: |
+          mkdir -p ~/app
+
+
+# name: Push Container to Server
+
+# on:
+#   push:
+#     branches:
+#       - location
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
     # - name: Checkout Repository
     #   uses: actions/checkout@v2
 
@@ -26,20 +46,20 @@ jobs:
     #     push: true
     #     tags: yuhao10/actiontest:latest
 
-    - name: SSH into Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: "62.72.36.174"
-        username: rootazertyui
-        password: ${{ secrets.SERVER_PASSWORD }}
+    # - name: SSH into Server
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: "62.72.36.174"
+    #     username: root
+    #     password: ${{ secrets.SERVER_PASSWORD }}
 
-    - name: Deploy Container
-      run: |
-        ls
-        cd ..
-        cd /t
-        ls
-        mkdir actiontest
+    # - name: Deploy Container
+    #   run: |
+    #     ls
+    #     cd ..
+    #     cd /t
+    #     ls
+    #     mkdir actiontest
          
 
     
