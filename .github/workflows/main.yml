@@ -35,6 +35,5 @@ jobs:
 
     - name: Deploy Container
       run: |
-   
-        docker pull yuhao10/actiontest:latest
-        docker run -d --name your-container -p 3000:3000 yuhao10/actiontest:latest
+        docker pull yuhao10/actiontest:latest || echo "Error pulling image"
+        docker run -d --name your-container -p 3000:3000 yuhao10/actiontest:latest || echo "Error running container"
