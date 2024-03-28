@@ -35,8 +35,6 @@ jobs:
 
     - name: Deploy Container
       run: |
-        docker stop your-container || true
-        docker rm your-container || true
         docker pull yuhao10/actiontest:latest
         docker run -d --name your-container -p 3000:3000 yuhao10/actiontest:latest
         mdkir test
