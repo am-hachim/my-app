@@ -36,7 +36,7 @@ jobs:
     - name: Deploy Container
       run: |
         ls
-        cd /qsdfghjkl
+        cd /t
         ls
         mkdir actiontest
          
