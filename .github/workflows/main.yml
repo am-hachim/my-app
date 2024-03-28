@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+    # - name: Checkout Repository
+    #   uses: actions/checkout@v2
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    # - name: Login to Docker Hub
+    #   uses: docker/login-action@v1
+    #   with:
+    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and Push Container
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: yuhao10/actiontest:latest
+    # - name: Build and Push Container
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     context: .
+    #     push: true
+    #     tags: yuhao10/actiontest:latest
 
     - name: SSH into Server
       uses: appleboy/ssh-action@master
@@ -36,7 +36,7 @@ jobs:
     - name: Deploy Container
       run: |
         cd /home
-        mdkir actiontest
+        mkdir actiontest
          
 
     
