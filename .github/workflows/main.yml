@@ -22,7 +22,7 @@ jobs:
     - name: Build and Push Container
       uses: docker/build-push-action@v2
       with:
-        context: ./Dockerfile  # Specify the Dockerfile path (optional)
+        context: ../Dockerfile  # Specify the Dockerfile path (optional)
         push: true
         tags: yuhao10/actiontest:latest
 
