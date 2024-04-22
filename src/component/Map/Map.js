@@ -40,7 +40,7 @@ const Map = () => {
 
   return (
     <div>
-      <button onClick={getCurrentPosition}>Get Loction mon negro</button>
+      <button onClick={getCurrentPosition}>Get Ltion mon negro</button>
       {/* Afficher la carte si la variable map est définie */}
       {map && (
         <div>
