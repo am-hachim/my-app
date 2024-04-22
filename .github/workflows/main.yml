@@ -33,7 +33,10 @@ jobs:
         username: root
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
-          docker stop nebula || true
-          docker rm nebula || true
-          docker pull yuhao10/actiontest:latest
-          docker run -d --name nebula -p 3000:3000 yuhao10/actiontest:latest
+          cd ~/neb
+          docker -compose down 
+          docker compose up
+          # docker stop nebula || true
+          # docker rm nebula || true
+          # docker pull yuhao10/actiontest:latest
+          # docker run -d --name nebula -p 3000:3000 yuhao10/actiontest:latest
