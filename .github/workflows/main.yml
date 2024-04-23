@@ -30,7 +30,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: "62.72.36.174"
-        username: root
+        username: nebulia
         password: ${{ secrets.SERVER_PASSWORD_NEBULIA }}
         script: |
           cd /nebula/front
