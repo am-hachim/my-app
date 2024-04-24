@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Notification } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
 
@@ -21,7 +20,7 @@ const marker = new L.Icon({
 
 const me = new L.Icon({
   iconUrl: require("./me.png"),
-  iconSize: [8, 8]
+  iconSize: [7, 7]
 })
 
 const MyLocationMarker = ({ setCurrentPosition }) => {
@@ -29,11 +28,11 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
 
   useEffect(() => {
     // Déclenche immédiatement une localisation au montage du composant
-    map.locate({ setView: true, maxZoom: map.getZoom() });
+    map.locate({ setView: true, maxZoom: 50 });
 
     // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: false, maxZoom: map.getZoom() });
+      map.locate({ setView: false, maxZoom: 50 });
     }, 500); // Mise à jour toutes les secondes
     
     // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
@@ -44,7 +43,7 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
     locationfound(e) {
       const newPosition = e.latlng;
       setCurrentPosition(newPosition); // Met à jour l'état avec la position actuelle
-      map.flyTo(newPosition, map.getZoom());
+      
     },
     locationerror(e) {
       console.error('Location error:', e.message);
@@ -59,11 +58,11 @@ const LocationUpdater = ({ setGeolocation }) => {
 
   useEffect(() => {
     // Déclenche immédiatement une localisation au montage du composant
-    map.locate({ setView: false, maxZoom: map.getZoom() });
+    map.locate({ setView: false, maxZoom: 50 });
 
     // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: true, maxZoom: map.getZoom() });
+      map.locate({ setView: false, maxZoom: 50 });
     }, 1000);
     
     // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
@@ -74,7 +73,7 @@ const LocationUpdater = ({ setGeolocation }) => {
     locationfound(e) {
       const newPosition = e.latlng;
       setGeolocation(prevPositions => [...prevPositions, newPosition]);
-      if (map) map.flyTo(newPosition, map.getZoom());
+      
     },
     locationerror(e) {
       console.error('Location error:', e.message);
@@ -131,7 +130,7 @@ const App = () => {
         setRunning(true);
         setIsTracking(true);
         if (!startPosition && geolocation.length > 0) { // Assurez-vous que geolocation est mis à jour avant
-          setStartPosition(geolocation[geolocation.length - 1]);
+          setStartPosition(geolocation[0]);
         }
       },
       matchInterim: true
@@ -189,23 +188,7 @@ const App = () => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
-  useEffect(() => {
-    let notificationInterval;
-    if (running) {
-      notificationInterval = setInterval(() => {
-        if (Notification.permission === 'granted') {
-          new Notification('Mise à jour de la position');
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              new Notification('Mise à jour de la position');
-            }
-          });
-        }
-      }, 30000);
-    }
-    return () => clearInterval(notificationInterval);
-  }, [running]);
+  // const position = [51.505, -0.09]
 
   return (
     <div className="dictaphone-container">
@@ -220,19 +203,19 @@ const App = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MyLocationMarker setCurrentPosition={setCurrentPosition} />
-          <Marker icon={me} position={currentPosition}></Marker>
-
-          {isTracking && <LocationUpdater setGeolocation={setGeolocation} />}
-          {geolocation && <Polyline positions={geolocation}></Polyline>}
-
-          {startPosition && (
+          {startPosition && isTracking && (
             <Marker icon={marker} position={startPosition}>
               <Popup>
               Début de l'itineraire
               </Popup>
             </Marker>
           )}
+          <MyLocationMarker setCurrentPosition={setCurrentPosition} />
+          <Marker icon={me} position={currentPosition}></Marker>
+
+          {isTracking && <LocationUpdater setGeolocation={setGeolocation} />}
+          <Polyline positions={geolocation}></Polyline>
+
           {lastPosition && !isTracking && (
             <Marker icon={marker} position={lastPosition}>
               <Popup>
@@ -240,7 +223,7 @@ const App = () => {
               </Popup>
             </Marker>
           )}
-        </MapContainer>,
+        </MapContainer>
       </div>
     </div>
   );
