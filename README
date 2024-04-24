@@ -15,6 +15,10 @@ Cette application React utilise la bibliothèque `react-speech-recognition` pour
 ### Composants principaux :
 
 1. **App** : Le composant principal qui gère l'état de l'application et les commandes vocales.
+  Pour commnencer l'itinaire vous pourrer utiliser 'Commencer', 'Débuter', 'Démarrer'
+  Pour terminer l'itinaire vous pourrer utiliser 'finir', 'fin', 'arrêter', 'stop', 'terminer'
+  
+  
 2. **MyLocationMarker** : Composant qui gère l'affichage du marqueur de la position actuelle de l'utilisateur.
 3. **LocationUpdater** : Composant qui met à jour la géolocalisation de l'utilisateur et l'affiche sur la carte.
 
