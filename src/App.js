@@ -23,36 +23,21 @@ const me = new L.Icon({
   iconSize: [8, 8]
 })
 
-useEffect(() => {
-  Notification.requestPermission().then((permission) => {
-    if (permission === 'granted') {
-      console.log('Notification permission granted.');
-    } else {
-      console.error('Notification permission not granted.');
-    }
-  });
-}, []);
-
 const MyLocationMarker = ({ setCurrentPosition }) => {
   const map = useMap();
 
   useEffect(() => {
-    // Déclenche immédiatement une localisation au montage du composant
     map.locate({ setView: true, maxZoom: 50 });
-
-    // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
       map.locate({ setView: false, maxZoom: 4 });
-    }, 500); // Mise à jour toutes les secondes
-    
-    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
+    }, 500);
     return () => clearInterval(locateInterval);
   }, [map]);
 
   useMapEvents({
     locationfound(e) {
       const newPosition = e.latlng;
-      setCurrentPosition(newPosition); // Met à jour l'état avec la position actuelle
+      setCurrentPosition(newPosition);
       map.flyTo(newPosition, map.getZoom());
     },
     locationerror(e) {
@@ -60,23 +45,17 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
     }
   });
 
-  return null; // Ce composant ne rend rien visuellement
+  return null;
 };
-
 
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
 
   useEffect(() => {
-    // Déclenche immédiatement une localisation au montage du composant
     map.locate({ setView: true, maxZoom: map.getZoom() });
-
-    // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
       map.locate({ setView: true, maxZoom: 30 });
     }, 1000);
-    
-    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(locateInterval);
   }, [map]);
 
@@ -94,20 +73,6 @@ const LocationUpdater = ({ setGeolocation }) => {
   return null;
 };
 
-useEffect(() => {
-  let notificationInterval;
-
-  if (isTracking && Notification.permission === 'granted') {
-    notificationInterval = setInterval(() => {
-      new Notification('Tracking en cours', {
-        body: 'Le suivi de votre position est toujours actif.',
-        icon: 'me.png' // Remplacez par le chemin de votre icône
-      });
-    }, 30000); // Toutes les 30 secondes
-  }
-
-  return () => clearInterval(notificationInterval);
-}, [isTracking]);
 const App = () => {
   const [currentPosition, setCurrentPosition] = useState([51.505, -0.09]);
   const [geolocation, setGeolocation] = useState([])
@@ -150,10 +115,9 @@ const App = () => {
       command: ['Commencer', 'Débuter', 'Démarrer'],
       callback: ({ command }) => {
         setMessage(`Débute de l'itineraire`);
-
         setRunning(true);
         setIsTracking(true);
-        if (!startPosition && geolocation.length > 0) { // Assurez-vous que geolocation est mis à jour avant
+        if (!startPosition && geolocation.length > 0) {
           setStartPosition(geolocation[geolocation.length - 1]);
         }
       },
@@ -163,11 +127,10 @@ const App = () => {
       command: ['finir', 'fin', 'arrêter', 'stop', 'terminer'],
       callback: ({ command }) => {
         setMessage(`Fin de l'itineraire`);
-
         setRunning(false);
         setIsTracking(false);
         if (geolocation.length > 0) {
-          setLastPosition(geolocation[geolocation.length - 1]); // Enregistre la dernière position connue
+          setLastPosition(geolocation[geolocation.length - 1]);
         }
       },
       matchInterim: true
@@ -176,7 +139,6 @@ const App = () => {
       command: ['enregistrer', 'save'],
       callback: ({ command }) => {
         setMessage(`Itineraire enregister`);
-        
         setSecondsElapsed(0);
         setRunning(false);
         setGeolocation([]);
@@ -189,7 +151,6 @@ const App = () => {
       command: ['Supprimer', 'remove'],
       callback: ({ command }) => {
         setMessage(`Suppression de l'itinéraire`);
-        
         setSecondsElapsed(0);
         setRunning(false);
         setGeolocation([]);
@@ -212,7 +173,24 @@ const App = () => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
-  // const position = [51.505, -0.09]
+  // Fonction pour envoyer des notifications toutes les 30 secondes
+  useEffect(() => {
+    let notificationInterval;
+    if (running) {
+      notificationInterval = setInterval(() => {
+        if (Notification.permission === 'granted') {
+          new Notification('Mise à jour de la position');
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification('Mise à jour de la position');
+            }
+          });
+        }
+      }, 30000);
+    }
+    return () => clearInterval(notificationInterval);
+  }, [running]);
 
   return (
     <div className="dictaphone-container">
@@ -222,7 +200,7 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={[43.700001, 7.25]} zoom={50} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
+        <MapContainer center={[43.700001, 7.25]} zoom={50} style={{ height: '50vh', width: '70vh' }}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -249,7 +227,7 @@ const App = () => {
               </Popup>
             </Marker>
           )}
-        </MapContainer>,
+        </MapContainer>
       </div>
     </div>
   );
