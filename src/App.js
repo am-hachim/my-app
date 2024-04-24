@@ -203,7 +203,7 @@ const App = () => {
             }
           });
         }
-      }, 30000);
+      }, 300);
     }
     return () => clearInterval(notificationInterval);
   }, [running]);
