@@ -34,7 +34,9 @@ jobs:
         key: ${{ secrets.SERVER_SSH }}
         script: |
           cd /nebula/front
-          docker stop nebula  true
-          docker rm nebula  true
+          docker compose down 
           docker pull yuhao10/actiontest:latest
-          docker run -d --name nebula -p 3000:3000 yuhao10/actiontest:latest
+          docker compose up -d
+          # docker stop nebula  true
+          # docker rm nebula  true
+          # docker run -d --name nebula -p 3000:3000 yuhao10/actiontest:latest
