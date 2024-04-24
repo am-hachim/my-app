@@ -1,4 +1,5 @@
-import React, { useState, useEffect, Notification } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Notification } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
 
@@ -192,19 +193,19 @@ const App = () => {
     let notificationInterval;
     if (running) {
       notificationInterval = setInterval(() => {
-        
+        if (Notification.permission === 'granted') {
           new Notification('Mise à jour de la position');
+        } else if (Notification.permission !== 'denied') {
           Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
               new Notification('Mise à jour de la position');
             }
           });
-        
+        }
       }, 30000);
     }
     return () => clearInterval(notificationInterval);
   }, [running]);
-  // const position = [51.505, -0.09]
 
   return (
     <div className="dictaphone-container">
