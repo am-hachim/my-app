@@ -1,12 +1,30 @@
+Voici un résumé du code dans un fichier README :
 
-##Liste des commandes a faire 
+## Application de suivi de position avec reconnaissance vocale
 
-docker build -t react-app-image:1 -f Dockerfile.dev .
+Cette application React utilise la bibliothèque `react-speech-recognition` pour permettre à l'utilisateur de contrôler l'application par la voix. Elle intègre également une carte Leaflet pour afficher la position de l'utilisateur en temps réel.
 
+### Principales fonctionnalités :
 
-docker run -d -p 3000:3000 -v /app/node_modules -v $(pwd):/app --name dockerized-react-app react-app-image:1
+1. **Reconnaissance vocale** : L'utilisateur peut utiliser des commandes vocales pour démarrer, arrêter et enregistrer un itinéraire.
+2. **Suivi de position** : L'application utilise l'API de géolocalisation du navigateur pour suivre la position de l'utilisateur en temps réel et afficher un marqueur sur la carte.
+3. **Affichage de l'itinéraire** : L'application trace un polyline sur la carte pour afficher le chemin parcouru par l'utilisateur.
+4. **Marqueurs de début et de fin** : Des marqueurs sont affichés pour indiquer le début et la fin de l'itinéraire.
+5. **Chronomètre** : Un chronomètre affiche la durée de l'itinéraire.
 
+### Composants principaux :
 
+1. **App** : Le composant principal qui gère l'état de l'application et les commandes vocales.
+2. **MyLocationMarker** : Composant qui gère l'affichage du marqueur de la position actuelle de l'utilisateur.
+3. **LocationUpdater** : Composant qui met à jour la géolocalisation de l'utilisateur et l'affiche sur la carte.
 
+### Bibliothèques utilisées :
 
+- **React** : Bibliothèque JavaScript pour la construction d'interfaces utilisateur.
+- **react-speech-recognition** : Bibliothèque pour la reconnaissance vocale dans les applications React.
+- **react-leaflet** : Bibliothèque pour l'intégration de cartes Leaflet dans les applications React.
+- **Leaflet** : Bibliothèque JavaScript pour l'affichage de cartes interactives.
 
+### CI/CD : 
+
+Le déploiement de l'application est automatisé à l'aide de GitHub Actions. Lorsqu'un commit est poussé sur la branche location, l'application est déployée sur GitHub Pages puis envoyé vers dockerHub depuis lequel l'image de notre app est recup.
