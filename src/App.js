@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
+import Cookies from 'js-cookie';
 
 // Assuming your images are in the public folder, you can refer to them like this
 import microphoneOn from './microphone-on.png';
@@ -149,10 +150,74 @@ const App = () => {
       matchInterim: true
     },
     {
-      command: ['enregistrer', 'save'],
-      callback: ({ command }) => {
-        setMessage(`Itineraire enregister`);
-        
+      command: "Ouvrir trajet *",
+      callback: (trajet) => {
+        setMessage(`Ouvrir trajet ${trajet}`);
+        // Récupérer les trajets existants du cookie
+        const allTrajets = Cookies.get('geolocations') ? JSON.parse(Cookies.get('geolocations')) : [];
+        const trajettest = `Trajet ${trajet}`;
+        console.log(trajettest)
+        // Trouver le trajet spécifique "Trajet 0"
+        const trajettouvé = allTrajets.find(trajet => trajet.name === trajettest);
+
+        if (trajettouvé) {
+          // Mettre à jour `geolocation` avec les coordonnées de "Trajet 0"
+          setGeolocation(trajettouvé.coordinates);
+        } else {
+          // S'il n'y a pas de "Trajet 0", peut-être initialiser à vide ou gérer l'erreur
+          setGeolocation([]);
+          setMessage(`Trajet ${trajet} non trouvé`);
+        }
+      },
+      matchInterim: true
+    },
+    {
+      command: ['enregistrer *', 'save *'],
+      callback: (trajet) => {
+        setMessage(`Itineraire ${trajet} enregister`);
+        const trajetName = `Trajet ${trajet}`;
+        // Récupérer les trajets existants ou initialiser un tableau vide
+        const existingGeolocations = Cookies.get('geolocations') ? JSON.parse(Cookies.get('geolocations')) : [];
+
+        // Vérifier si le trajet existe déjà
+        const trajetExists = existingGeolocations.some(trajet => trajet.name === trajetName);
+
+
+        // Créer un nouveau trajet avec les données actuelles de geolocation
+        if (!trajetExists) {
+          // Créer un nouveau trajet avec les données actuelles de geolocation
+          const newTrajet = {
+            name: trajetName,
+            coordinates: geolocation
+          };
+    
+          // Ajouter le nouveau trajet aux trajets existants
+          const updatedGeolocations = [...existingGeolocations, newTrajet];
+    
+          // Enregistrer le tableau mis à jour dans les cookies
+          Cookies.set('geolocations', JSON.stringify(updatedGeolocations)); // Le cookie expire après 7 jours
+    
+          setMessage(`Itineraire ${trajetName} enregistré`);
+        } else {
+          setMessage(`Itineraire ${trajetName} existe déjà. Enregistrement annulé.`);
+        }
+
+        // const trajet1 = {
+        //   name: `Trajet 1`,
+        //   coordinates: [
+        //     [51.505, -0.09],
+        //     [50.633333, 3.066667],
+        //     [48.8534951, 2.3483915],
+        //     [43.628644, 7.117534],
+        //     [43.620883, 7.118732]
+        //   ]
+        // };
+
+        // Ajouter le nouveau trajet aux trajets existants
+        // const updatedGeolocations = [...existingGeolocations, trajet1];
+        // Cookies.set('geolocations', JSON.stringify(updatedGeolocations)); // Le cookie expire après 7 jours
+
+
         setSecondsElapsed(0);
         setRunning(false);
         setGeolocation([]);
@@ -187,23 +252,6 @@ const App = () => {
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
-
-  useEffect(() => {
-    let notificationInterval;
-    if (running) {
-      notificationInterval = setInterval(() => {
-        
-          new Notification('Mise à jour de la position');
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              new Notification('Va boire');
-            }
-          });
-        
-      }, 30000);
-    }
-    return () => clearInterval(notificationInterval);
-  }, [running]);
 
   // const position = [51.505, -0.09]
 
