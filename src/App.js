@@ -18,7 +18,36 @@ const marker = new L.Icon({
   popupAnchor: [0, -37],
 })
 
+const me = new L.Icon({
+  iconUrl: require("./me.png"),
+  iconSize: [8, 8]
+})
 
+
+const MyLocationMarker = () => {
+  const [position, setPosition] = useState(null);
+
+  useEffect(() => {
+    const watchID = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setPosition([latitude, longitude]);
+      },
+      (err) => {
+        console.error(err);
+      },
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchID);
+    };
+  }, []);
+
+  return position ? (
+    <Marker icon={me} position={position} />
+  ) : null;
+};
 
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
@@ -94,12 +123,6 @@ const App = () => {
 
   const commands = [
     {
-      command: "fond d'écran *",
-      callback: (color) => {
-        document.body.style.background = color;
-      }
-    },
-    {
       command: ['Commencer', 'Débuter', 'Démarrer'],
       callback: ({ command }) => {
         setMessage(`Débute de l'itineraire`);
@@ -115,7 +138,8 @@ const App = () => {
     {
       command: ['finir', 'fin', 'arrêter', 'stop', 'terminer'],
       callback: ({ command }) => {
-        setMessage(`Fin de l'itineraire`)
+        setMessage(`Fin de l'itineraire`);
+
         setRunning(false);
         setIsTracking(false);
         if (geolocation.length > 0) {
@@ -165,8 +189,9 @@ const App = () => {
   }
 
 
-
-  const position = [51.505, -0.09]
+  // const map = useMap();
+  // map.locate({ setView: true, maxZoom: map.getZoom() });
+  // const position = [51.505, -0.09]
 
 
   return (
@@ -177,15 +202,16 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={{ lat: 50.1109, lng: 0.1313 }} zoom={6} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
+        <MapContainer center={{ lat: 50.1109, lng: 0.1313 }} zoom={20} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <MyLocationMarker />
           {startPosition && (
             <Marker icon={marker} position={startPosition}>
               <Popup>
-              Début de l'itineraire
+                Début de l'itineraire
               </Popup>
             </Marker>
           )}
