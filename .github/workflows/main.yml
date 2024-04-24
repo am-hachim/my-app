@@ -31,7 +31,7 @@ jobs:
       with:
         host: "62.72.36.174"
         username: nebulia
-        password: ${{ secrets.SERVER_PASSWORD_NEBULIA }}
+        key: ${{ secrets.SERVER_SSH }}
         script: |
           cd /nebula/front
           docker stop nebula  true
