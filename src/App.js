@@ -196,7 +196,7 @@ const App = () => {
           new Notification('Mise à jour de la position');
           Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
-              new Notification('Mise à jour de la position');
+              new Notification('Va boire');
             }
           });
         
