@@ -33,7 +33,7 @@ jobs:
         username: nebulia
         key: ${{ secrets.SERVER_SSH }}
         script: |
-          cd /nebula/front
+          cd ~/nebula/front
           docker compose down 
           docker pull yuhao10/actiontest:latest
           docker compose up -d
