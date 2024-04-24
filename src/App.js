@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
+import { scheduleHandWashNotification } from './NotificationManager'; // Import du gestionnaire de notifications
+import Notification from './NotificationManager';
+import requestForToken from './firebaseNotification/firebase'
+
+
 
 // Assuming your images are in the public folder, you can refer to them like this
 import microphoneOn from './microphone-on.png';
@@ -17,6 +22,12 @@ const marker = new L.Icon({
   iconAnchor: [15, 37],
   popupAnchor: [0, -37],
 })
+
+  useEffect(() => {
+    requestForToken();
+     scheduleHandWashNotification(); // Appel pour planifier les notifications de lavage des mains
+  }, []); // Utilisation de useEffect pour s'assurer que cela ne se produit qu'une seule fois
+
 
 
 
