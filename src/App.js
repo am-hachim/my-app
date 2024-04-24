@@ -28,11 +28,11 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
 
   useEffect(() => {
     // Déclenche immédiatement une localisation au montage du composant
-    map.locate({ setView: true, maxZoom: map.getZoom() });
+    map.locate({ setView: true, maxZoom: 50 });
 
     // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: true, maxZoom: 30 });
+      map.locate({ setView: false, maxZoom: 4 });
     }, 500); // Mise à jour toutes les secondes
     
     // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
@@ -198,7 +198,7 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={[43.700001, 7.25]} zoom={30} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
+        <MapContainer center={[43.700001, 7.25]} zoom={50} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
