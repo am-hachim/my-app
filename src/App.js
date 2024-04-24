@@ -32,8 +32,8 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
 
     // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: true, maxZoom: map.getZoom() });
-    }, 100); // Mise à jour toutes les secondes
+      map.locate({ setView: true, maxZoom: 30 });
+    }, 500); // Mise à jour toutes les secondes
     
     // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(locateInterval);
@@ -62,7 +62,7 @@ const LocationUpdater = ({ setGeolocation }) => {
 
     // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: true, maxZoom: map.getZoom() });
+      map.locate({ setView: true, maxZoom: 30 });
     }, 1000);
     
     // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
@@ -86,11 +86,7 @@ const LocationUpdater = ({ setGeolocation }) => {
 
 const App = () => {
   const [currentPosition, setCurrentPosition] = useState([51.505, -0.09]);
-  const [geolocation, setGeolocation] = useState([
-    [51.505, -0.09],
-    [50.633333, 3.066667],
-    [48.8534951, 2.3483915]]
-  )
+  const [geolocation, setGeolocation] = useState([])
   const [isTracking, setIsTracking] = useState(false);
   const [startPosition, setStartPosition] = useState(null);
   const [lastPosition, setLastPosition] = useState(null);
@@ -202,13 +198,17 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={currentPosition || [51.505, -0.09]} zoom={20} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
+        <MapContainer center={[43.700001, 7.25]} zoom={30} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <MyLocationMarker setCurrentPosition={setCurrentPosition} />
-          <Marker icon={me} position={currentPosition}></Marker>
+          <Marker icon={me} position={currentPosition}>
+            <Popup>
+            {message}
+            </Popup>
+          </Marker>
           {startPosition && (
             <Marker icon={marker} position={startPosition}>
               <Popup>
