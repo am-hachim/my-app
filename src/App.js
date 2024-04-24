@@ -23,11 +23,6 @@ const marker = new L.Icon({
   popupAnchor: [0, -37],
 })
 
-  useEffect(() => {
-    requestForToken();
-     scheduleHandWashNotification(); // Appel pour planifier les notifications de lavage des mains
-  }, []); // Utilisation de useEffect pour s'assurer que cela ne se produit qu'une seule fois
-
 
 
 
@@ -35,6 +30,8 @@ const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
 
   useEffect(() => {
+    requestForToken();
+    scheduleHandWashNotification();
     const locateInterval = setInterval(() => {
       map.locate({ setView: true, maxZoom: map.getZoom() });
     }, 5000);
