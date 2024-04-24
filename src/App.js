@@ -23,6 +23,16 @@ const me = new L.Icon({
   iconSize: [8, 8]
 })
 
+useEffect(() => {
+  Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+    } else {
+      console.error('Notification permission not granted.');
+    }
+  });
+}, []);
+
 const MyLocationMarker = ({ setCurrentPosition }) => {
   const map = useMap();
 
@@ -52,6 +62,7 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
 
   return null; // Ce composant ne rend rien visuellement
 };
+
 
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
@@ -83,7 +94,20 @@ const LocationUpdater = ({ setGeolocation }) => {
   return null;
 };
 
+useEffect(() => {
+  let notificationInterval;
 
+  if (isTracking && Notification.permission === 'granted') {
+    notificationInterval = setInterval(() => {
+      new Notification('Tracking en cours', {
+        body: 'Le suivi de votre position est toujours actif.',
+        icon: 'me.png' // Remplacez par le chemin de votre icône
+      });
+    }, 30000); // Toutes les 30 secondes
+  }
+
+  return () => clearInterval(notificationInterval);
+}, [isTracking]);
 const App = () => {
   const [currentPosition, setCurrentPosition] = useState([51.505, -0.09]);
   const [geolocation, setGeolocation] = useState([])
