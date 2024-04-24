@@ -23,30 +23,34 @@ const me = new L.Icon({
   iconSize: [8, 8]
 })
 
-
-const MyLocationMarker = () => {
-  const [position, setPosition] = useState(null);
+const MyLocationMarker = ({ setCurrentPosition }) => {
+  const map = useMap();
 
   useEffect(() => {
-    const watchID = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setPosition([latitude, longitude]);
-      },
-      (err) => {
-        console.error(err);
-      },
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
-    );
+    // Déclenche immédiatement une localisation au montage du composant
+    map.locate({ setView: true, maxZoom: map.getZoom() });
 
-    return () => {
-      navigator.geolocation.clearWatch(watchID);
-    };
-  }, []);
+    // Ensuite, continue avec un intervalle régulier
+    const locateInterval = setInterval(() => {
+      map.locate({ setView: true, maxZoom: map.getZoom() });
+    }, 100); // Mise à jour toutes les secondes
+    
+    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
+    return () => clearInterval(locateInterval);
+  }, [map]);
 
-  return position ? (
-    <Marker icon={me} position={position} />
-  ) : null;
+  useMapEvents({
+    locationfound(e) {
+      const newPosition = e.latlng;
+      setCurrentPosition(newPosition); // Met à jour l'état avec la position actuelle
+      map.flyTo(newPosition, map.getZoom());
+    },
+    locationerror(e) {
+      console.error('Location error:', e.message);
+    }
+  });
+
+  return null; // Ce composant ne rend rien visuellement
 };
 
 const LocationUpdater = ({ setGeolocation }) => {
@@ -81,7 +85,7 @@ const LocationUpdater = ({ setGeolocation }) => {
 
 
 const App = () => {
-  
+  const [currentPosition, setCurrentPosition] = useState([51.505, -0.09]);
   const [geolocation, setGeolocation] = useState([
     [51.505, -0.09],
     [50.633333, 3.066667],
@@ -188,11 +192,7 @@ const App = () => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
-
-  // const map = useMap();
-  // map.locate({ setView: true, maxZoom: map.getZoom() });
   // const position = [51.505, -0.09]
-
 
   return (
     <div className="dictaphone-container">
@@ -202,16 +202,17 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={{ lat: 50.1109, lng: 0.1313 }} zoom={20} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
+        <MapContainer center={currentPosition || [51.505, -0.09]} zoom={20} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MyLocationMarker />
+          <MyLocationMarker setCurrentPosition={setCurrentPosition} />
+          <Marker icon={me} position={currentPosition}></Marker>
           {startPosition && (
             <Marker icon={marker} position={startPosition}>
               <Popup>
-                Début de l'itineraire
+              Début de l'itineraire
               </Popup>
             </Marker>
           )}
