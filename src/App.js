@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
-import { scheduleHandWashNotification } from './NotificationManager'; // Import du gestionnaire de notifications
-import Notification from './NotificationManager';
-import requestForToken from './firebaseNotification/firebase'
-
-
 
 // Assuming your images are in the public folder, you can refer to them like this
 import microphoneOn from './microphone-on.png';
@@ -26,12 +21,11 @@ const marker = new L.Icon({
 
 
 
+
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
 
   useEffect(() => {
-    requestForToken();
-    scheduleHandWashNotification();
     const locateInterval = setInterval(() => {
       map.locate({ setView: true, maxZoom: map.getZoom() });
     }, 5000);
