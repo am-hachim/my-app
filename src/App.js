@@ -19,8 +19,7 @@ const marker = new L.Icon({
 })
 
 
-
-const LocationUpdater = ({ setGeolocation }) => {
+const LocationUpdater = ({ setGeolocation, setMarkerPosition }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -34,6 +33,7 @@ const LocationUpdater = ({ setGeolocation }) => {
     locationfound(e) {
       const newPosition = e.latlng;
       setGeolocation(prevPositions => [...prevPositions, newPosition]);
+      setMarkerPosition(newPosition); // Update the marker position
       if (map) map.flyTo(newPosition, map.getZoom());
     },
     locationerror(e) {
@@ -43,7 +43,6 @@ const LocationUpdater = ({ setGeolocation }) => {
 
   return null;
 };
-
 
 const App = () => {
   const [geolocation, setGeolocation] = useState([
