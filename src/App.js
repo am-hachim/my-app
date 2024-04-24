@@ -27,17 +27,22 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
   const map = useMap();
 
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: 50 });
+    // Déclenche immédiatement une localisation au montage du composant
+    map.locate({ setView: false, maxZoom: 50 });
+
+    // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: false, maxZoom: 4 });
-    }, 500);
+      map.locate({ setView: false, maxZoom: 50 });
+    }, 500); // Mise à jour toutes les secondes
+    
+    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(locateInterval);
   }, [map]);
 
   useMapEvents({
     locationfound(e) {
       const newPosition = e.latlng;
-      setCurrentPosition(newPosition);
+      setCurrentPosition(newPosition); // Met à jour l'état avec la position actuelle
       map.flyTo(newPosition, map.getZoom());
     },
     locationerror(e) {
@@ -45,17 +50,22 @@ const MyLocationMarker = ({ setCurrentPosition }) => {
     }
   });
 
-  return null;
+  return null; // Ce composant ne rend rien visuellement
 };
 
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
 
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: map.getZoom() });
+    // Déclenche immédiatement une localisation au montage du composant
+    map.locate({ setView: false, maxZoom: map.getZoom() });
+
+    // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
-      map.locate({ setView: true, maxZoom: 30 });
+      map.locate({ setView: true, maxZoom: 50 });
     }, 1000);
+    
+    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(locateInterval);
   }, [map]);
 
@@ -72,6 +82,7 @@ const LocationUpdater = ({ setGeolocation }) => {
 
   return null;
 };
+
 
 const App = () => {
   const [currentPosition, setCurrentPosition] = useState([51.505, -0.09]);
@@ -115,9 +126,10 @@ const App = () => {
       command: ['Commencer', 'Débuter', 'Démarrer'],
       callback: ({ command }) => {
         setMessage(`Débute de l'itineraire`);
+
         setRunning(true);
         setIsTracking(true);
-        if (!startPosition && geolocation.length > 0) {
+        if (!startPosition && geolocation.length > 0) { // Assurez-vous que geolocation est mis à jour avant
           setStartPosition(geolocation[geolocation.length - 1]);
         }
       },
@@ -127,10 +139,11 @@ const App = () => {
       command: ['finir', 'fin', 'arrêter', 'stop', 'terminer'],
       callback: ({ command }) => {
         setMessage(`Fin de l'itineraire`);
+
         setRunning(false);
         setIsTracking(false);
         if (geolocation.length > 0) {
-          setLastPosition(geolocation[geolocation.length - 1]);
+          setLastPosition(geolocation[geolocation.length - 1]); // Enregistre la dernière position connue
         }
       },
       matchInterim: true
@@ -139,6 +152,7 @@ const App = () => {
       command: ['enregistrer', 'save'],
       callback: ({ command }) => {
         setMessage(`Itineraire enregister`);
+        
         setSecondsElapsed(0);
         setRunning(false);
         setGeolocation([]);
@@ -151,6 +165,7 @@ const App = () => {
       command: ['Supprimer', 'remove'],
       callback: ({ command }) => {
         setMessage(`Suppression de l'itinéraire`);
+        
         setSecondsElapsed(0);
         setRunning(false);
         setGeolocation([]);
@@ -173,6 +188,7 @@ const App = () => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
+  // const position = [51.505, -0.09]
   // Fonction pour envoyer des notifications toutes les 30 secondes
   useEffect(() => {
     let notificationInterval;
@@ -192,6 +208,8 @@ const App = () => {
     return () => clearInterval(notificationInterval);
   }, [running]);
 
+
+
   return (
     <div className="dictaphone-container">
       <button className="microphone-status" onClick={toggleMicrophone}>
@@ -200,7 +218,7 @@ const App = () => {
       <p className="response">Réponse : {message}</p>
       <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
-        <MapContainer center={[43.700001, 7.25]} zoom={50} style={{ height: '50vh', width: '70vh' }}>
+        <MapContainer center={[43.700001, 7.25]} zoom={50} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -227,7 +245,7 @@ const App = () => {
               </Popup>
             </Marker>
           )}
-        </MapContainer>
+        </MapContainer>,
       </div>
     </div>
   );
