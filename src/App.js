@@ -20,15 +20,19 @@ const marker = new L.Icon({
 
 
 
-
-
 const LocationUpdater = ({ setGeolocation }) => {
   const map = useMap();
 
   useEffect(() => {
+    // Déclenche immédiatement une localisation au montage du composant
+    map.locate({ setView: true, maxZoom: map.getZoom() });
+
+    // Ensuite, continue avec un intervalle régulier
     const locateInterval = setInterval(() => {
       map.locate({ setView: true, maxZoom: map.getZoom() });
-    }, 5000);
+    }, 1000);
+    
+    // Fonction de nettoyage pour arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(locateInterval);
   }, [map]);
 
@@ -48,12 +52,34 @@ const LocationUpdater = ({ setGeolocation }) => {
 
 
 const App = () => {
+  
   const [geolocation, setGeolocation] = useState([
     [51.505, -0.09],
     [50.633333, 3.066667],
     [48.8534951, 2.3483915]]
   )
   const [isTracking, setIsTracking] = useState(false);
+  const [startPosition, setStartPosition] = useState(null);
+  const [lastPosition, setLastPosition] = useState(null);
+
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    let interval;
+    if (running) {
+      interval = setInterval(() => {
+        setSecondsElapsed(prevSeconds => prevSeconds + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [running]);
+
+  const formatTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   const toggleMicrophone = () => {
     if (listening) {
@@ -77,7 +103,12 @@ const App = () => {
       command: ['Commencer', 'Débuter', 'Démarrer'],
       callback: ({ command }) => {
         setMessage(`Débute de l'itineraire`);
+
+        setRunning(true);
         setIsTracking(true);
+        if (!startPosition && geolocation.length > 0) { // Assurez-vous que geolocation est mis à jour avant
+          setStartPosition(geolocation[geolocation.length - 1]);
+        }
       },
       matchInterim: true
     },
@@ -85,18 +116,38 @@ const App = () => {
       command: ['finir', 'fin', 'arrêter', 'stop', 'terminer'],
       callback: ({ command }) => {
         setMessage(`Fin de l'itineraire`)
+        setRunning(false);
         setIsTracking(false);
+        if (geolocation.length > 0) {
+          setLastPosition(geolocation[geolocation.length - 1]); // Enregistre la dernière position connue
+        }
       },
       matchInterim: true
     },
     {
       command: ['enregistrer', 'save'],
-      callback: ({ command }) => setMessage(`Itineraire enregister`),
+      callback: ({ command }) => {
+        setMessage(`Itineraire enregister`);
+        
+        setSecondsElapsed(0);
+        setRunning(false);
+        setGeolocation([]);
+        setStartPosition(null);
+        setLastPosition(null);
+      },
       matchInterim: true
     },
     {
       command: ['Supprimer', 'remove'],
-      callback: ({ command }) => setMessage(`Suppression de l'itinéraire`),
+      callback: ({ command }) => {
+        setMessage(`Suppression de l'itinéraire`);
+        
+        setSecondsElapsed(0);
+        setRunning(false);
+        setGeolocation([]);
+        setStartPosition(null)
+        setLastPosition(null);
+      },
       matchInterim: true
     }
   ]
@@ -124,19 +175,29 @@ const App = () => {
         <img src={listening ? microphoneOn : microphoneOff} alt="Microphone" />
       </button>
       <p className="response">Réponse : {message}</p>
+      <p className="chrono">{formatTime(secondsElapsed)}</p>
       <div style={{ display: 'grid', justifyContent: 'center', alignItems: 'center', height: '50vh', marginTop: "20px" }}>
         <MapContainer center={{ lat: 50.1109, lng: 0.1313 }} zoom={6} style={{ height: '50vh', width: '70vh' }}>{/*scrollWheelZoom={false}*/}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Marker icon={marker} position={position}>
-            {/* <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup> */}
-          </Marker>
+          {startPosition && (
+            <Marker icon={marker} position={startPosition}>
+              <Popup>
+              Début de l'itineraire
+              </Popup>
+            </Marker>
+          )}
           {isTracking && <LocationUpdater setGeolocation={setGeolocation} />}
-          <Polyline positions={geolocation}></Polyline>
+          {geolocation && <Polyline positions={geolocation}></Polyline>}
+          {lastPosition && !isTracking && (
+            <Marker icon={marker} position={lastPosition}>
+              <Popup>
+                Fin de l'itineraire
+              </Popup>
+            </Marker>
+          )}
         </MapContainer>,
       </div>
     </div>

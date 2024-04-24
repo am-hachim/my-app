@@ -73,3 +73,24 @@
     width: 90%;
   }
 }
+
+/* Styles généraux pour le container du chronomètre */
+p.chrono {
+  font-family: 'Roboto Mono', monospace; /* Une police mono-espacée pour un aspect plus technique */
+  font-size: 1.5em; /* Taille de la police agrandie pour une meilleure lisibilité */
+  color: #4CAF50; /* Couleur verte vive pour l'énergie */
+  background-color: #FFF; /* Arrière-plan blanc pour faire ressortir le texte */
+  border: 2px solid #4CAF50; /* Bordure solide qui correspond à la couleur du texte */
+  padding: 10px 20px; /* Padding pour donner de l'espace autour du texte */
+  border-radius: 10px; /* Bords arrondis */
+  text-align: center; /* Centrage du texte */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère pour un effet 3D subtil */
+  display: inline-block; /* Permet au <p> de ne prendre que l'espace nécessaire */
+  margin: 20px; /* Marge pour éviter que le chrono touche d'autres éléments */
+  transition: transform 0.2s ease-in-out; /* Transition pour l'animation */
+}
+
+p.chrono:hover {
+  transform: scale(1.1); /* Légère augmentation de taille au survol pour un effet interactif */
+  cursor: pointer; /* Change le curseur en main pour indiquer qu'il est interactif */
+}
