@@ -253,6 +253,24 @@ const App = () => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
+  useEffect(() => {
+    let notificationInterval;
+    if (running) {
+      notificationInterval = setInterval(() => {
+        
+          new Notification('Va boire');
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification('Va boire');
+            }
+          });
+        
+      }, 30000);
+    }
+    return () => clearInterval(notificationInterval);
+  }, [running]);
+
+
   // const position = [51.505, -0.09]
 
   return (
